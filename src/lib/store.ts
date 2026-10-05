@@ -210,6 +210,6 @@ export async function resetDemo() {
   const keys = await kv().keys("avr:*");
   // Keep the cached Vapi assistant id (avoids a re-sync) and the version counter
   // (so open dashboards notice the reset instead of seeing an "unchanged" version).
-  await kv().del(keys.filter((k) => k !== "avr:vapi:assistant" && k !== K.version));
+  await kv().del(keys.filter((k) => !k.startsWith("avr:vapi:assistant") && k !== K.version));
   await bump();
 }

@@ -1,8 +1,16 @@
+import { createHash } from "node:crypto";
 import type { CustomerRecord } from "@/data/customers";
 import { config, webhookSecret } from "@/lib/config";
 import { nowSpokenIST } from "@/lib/format";
 
-export const ASSISTANT_NAME = "Autopay Recovery Agent (demo)";
+/**
+ * One Vapi assistant per deployment URL. Local (tunnel) and production must not share an
+ * assistant, or syncing one would silently repoint the other's webhooks.
+ */
+export function assistantName(baseUrl: string): string {
+  const tag = createHash("sha256").update(baseUrl).digest("hex").slice(0, 6);
+  return `Autopay Recovery Agent · ${tag}`;
+}
 
 /**
  * The prompt deliberately contains NO account data (amount, failure reason, dates).
@@ -131,7 +139,7 @@ export function buildAssistant(baseUrl: string) {
   if (config.vapi.voiceVersion) voice.version = config.vapi.voiceVersion;
 
   return {
-    name: ASSISTANT_NAME,
+    name: assistantName(baseUrl),
     firstMessage:
       "Hi, this is Maya, an AI assistant calling from {{merchantName}}. This call may be recorded for quality. Am I speaking with {{customerFirstName}}?",
     firstMessageMode: "assistant-speaks-first",
@@ -207,7 +215,7 @@ export function buildAssistant(baseUrl: string) {
       structuredDataPlan: { enabled: true, schema: ANALYSIS_SCHEMA },
     },
     artifactPlan: { recordingEnabled: true },
-    metadata: { app: "autopay-recovery-demo" },
+    metadata: { app: "autopay-recovery-demo", baseUrl },
   };
 }
 

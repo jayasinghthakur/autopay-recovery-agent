@@ -1,10 +1,10 @@
 import { createHash } from "node:crypto";
-import { ASSISTANT_NAME, buildAssistant } from "@/lib/agent";
+import { buildAssistant } from "@/lib/agent";
 import { config } from "@/lib/config";
 import { kv } from "@/lib/kv";
 
 const API = "https://api.vapi.ai";
-const CACHE_KEY = "avr:vapi:assistant";
+const ASSISTANT_CACHE_PREFIX = "avr:vapi:assistant";
 
 async function vapi<T>(path: string, init: RequestInit = {}): Promise<T> {
   if (!config.vapi.privateKey) throw new Error("VAPI_PRIVATE_KEY is not configured.");
@@ -33,13 +33,15 @@ async function vapi<T>(path: string, init: RequestInit = {}): Promise<T> {
 export async function ensureAssistant(baseUrl: string): Promise<string> {
   const body = buildAssistant(baseUrl);
   const hash = createHash("sha256").update(JSON.stringify(body)).digest("hex").slice(0, 16);
-  const cached = await kv().get<{ id: string; hash: string }>(CACHE_KEY);
+  // Keyed by assistant name (i.e. deployment URL) so environments sharing one Redis don't collide.
+  const cacheKey = `${ASSISTANT_CACHE_PREFIX}:${body.name}`;
+  const cached = await kv().get<{ id: string; hash: string }>(cacheKey);
   if (cached?.hash === hash) return cached.id;
 
   let id = cached?.id;
   if (!id) {
     const existing = await vapi<{ id: string; name?: string }[]>("/assistant?limit=100");
-    id = (Array.isArray(existing) ? existing : []).find((a) => a.name === ASSISTANT_NAME)?.id;
+    id = (Array.isArray(existing) ? existing : []).find((a) => a.name === body.name)?.id;
   }
 
   if (id) {
@@ -54,7 +56,7 @@ export async function ensureAssistant(baseUrl: string): Promise<string> {
     id = (await vapi<{ id: string }>("/assistant", { method: "POST", body: JSON.stringify(body) })).id;
   }
 
-  await kv().set(CACHE_KEY, { id, hash });
+  await kv().set(cacheKey, { id, hash });
   return id;
 }
 
