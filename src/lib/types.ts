@@ -103,8 +103,10 @@ export interface CustomerView {
   mandate: { method: string; instrument: string; maxAmount?: number };
   failure: { code: string; label: string; explanation: string; failedOn: string; debitAttempts: number };
   latestRetryDate: string;
-  demoHint: string;
-  verificationHint: string;
+  scenario: string;
+  tryLine: string;
+  /** Year of birth, shown to the person role-playing. Checked server-side; never sent to the agent. */
+  verifyAnswer: string;
   state: CustomerState;
   lastCall?: CallRecord;
   status: DisplayStatus;

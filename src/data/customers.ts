@@ -34,7 +34,10 @@ export interface CustomerRecord {
   mandate: { method: MandateMethod; instrument: string; maxAmount?: number };
   failure: { code: FailureCode; failedDaysAgo: number; debitAttempts: number };
   graceDays: number; // days after the failed debit before service is paused
-  demoHint: string; // suggested role-play for whoever answers the call
+  /** Two-to-three word role-play tag shown on the card (never sent to the agent). */
+  scenario: string;
+  /** A line the person playing the customer can say to trigger the scenario. */
+  tryLine: string;
 }
 
 export const CUSTOMERS: CustomerRecord[] = [
@@ -53,7 +56,8 @@ export const CUSTOMERS: CustomerRecord[] = [
     mandate: { method: "UPI Autopay", instrument: "aa•••@okicici", maxAmount: 1000 },
     failure: { code: "INSUFFICIENT_FUNDS", failedDaysAgo: 2, debitAttempts: 1 },
     graceDays: 7,
-    demoHint: "Cooperative. Says the account was low on payday-eve and wants to pay right now — ask for the link.",
+    scenario: "Pays right away",
+    tryLine: "I'd like to pay now.",
   },
   {
     id: "CUST-1002",
@@ -70,7 +74,8 @@ export const CUSTOMERS: CustomerRecord[] = [
     mandate: { method: "Card e-mandate", instrument: "Visa •••• 4821 (expired 09/26)" },
     failure: { code: "CARD_EXPIRED", failedDaysAgo: 1, debitAttempts: 1 },
     graceDays: 5,
-    demoHint: "Got a new card last month and forgot to update it. Wants to set up autopay on the new card.",
+    scenario: "Has a new card",
+    tryLine: "I got a new card last month.",
   },
   {
     id: "CUST-1003",
@@ -87,7 +92,8 @@ export const CUSTOMERS: CustomerRecord[] = [
     mandate: { method: "eNACH", instrument: "HDFC Bank a/c •••• 2290" },
     failure: { code: "BANK_TECHNICAL_DECLINE", failedDaysAgo: 1, debitAttempts: 1 },
     graceDays: 7,
-    demoHint: "Slightly annoyed — 'I had money in the account!'. Happy to let the system retry tomorrow.",
+    scenario: "Retry tomorrow",
+    tryLine: "Can you just try again tomorrow?",
   },
   {
     id: "CUST-1004",
@@ -104,7 +110,8 @@ export const CUSTOMERS: CustomerRecord[] = [
     mandate: { method: "UPI Autopay", instrument: "sn•••@okhdfcbank", maxAmount: 5000 },
     failure: { code: "MANDATE_REVOKED", failedDaysAgo: 4, debitAttempts: 1 },
     graceDays: 15,
-    demoHint: "Revoked the mandate on purpose and wants to cancel the policy. The agent should not push.",
+    scenario: "Wants to cancel",
+    tryLine: "I cancelled it on purpose — I want to stop the policy.",
   },
   {
     id: "CUST-1005",
@@ -121,7 +128,8 @@ export const CUSTOMERS: CustomerRecord[] = [
     mandate: { method: "eNACH", instrument: "SBI a/c •••• 6612" },
     failure: { code: "INSUFFICIENT_FUNDS", failedDaysAgo: 3, debitAttempts: 2 },
     graceDays: 7,
-    demoHint: "Salary is delayed by a few days. Asks to retry the debit in 3 days. (Alt: say you lost your job → hardship.)",
+    scenario: "Salary delayed",
+    tryLine: "My salary comes in three days. Retry after that?",
   },
   {
     id: "CUST-1006",
@@ -138,7 +146,8 @@ export const CUSTOMERS: CustomerRecord[] = [
     mandate: { method: "UPI Autopay", instrument: "an•••@ybl", maxAmount: 1500 },
     failure: { code: "MANDATE_PAUSED", failedDaysAgo: 2, debitAttempts: 1 },
     graceDays: 7,
-    demoHint: "Busy right now. Asks for a callback this evening around 6 PM.",
+    scenario: "Busy, call later",
+    tryLine: "I'm busy — call me at 6 PM.",
   },
   {
     id: "CUST-1007",
@@ -155,7 +164,8 @@ export const CUSTOMERS: CustomerRecord[] = [
     mandate: { method: "UPI Autopay", instrument: "ka•••@oksbi", maxAmount: 1000 },
     failure: { code: "MANDATE_LIMIT_EXCEEDED", failedDaysAgo: 1, debitAttempts: 1 },
     graceDays: 5,
-    demoHint: "Upgraded the plan last month. Confused why it failed; agrees to re-authorise autopay with a higher limit.",
+    scenario: "Upgraded plan",
+    tryLine: "Why did it fail? I upgraded last month.",
   },
   {
     id: "CUST-1008",
@@ -172,7 +182,8 @@ export const CUSTOMERS: CustomerRecord[] = [
     mandate: { method: "Card e-mandate", instrument: "Mastercard •••• 1006" },
     failure: { code: "BANK_TECHNICAL_DECLINE", failedDaysAgo: 3, debitAttempts: 1 },
     graceDays: 7,
-    demoHint: "Insists the money WAS debited from her account. The agent should raise a dispute, not ask her to pay again.",
+    scenario: "Says already paid",
+    tryLine: "The money was already debited from my account!",
   },
   {
     id: "CUST-1009",
@@ -189,7 +200,8 @@ export const CUSTOMERS: CustomerRecord[] = [
     mandate: { method: "eNACH", instrument: "Axis Bank a/c •••• 7781 (closed)" },
     failure: { code: "ACCOUNT_CLOSED", failedDaysAgo: 5, debitAttempts: 2 },
     graceDays: 10,
-    demoHint: "Irritated. Says 'stop calling me' — the agent must record do-not-call and end politely.",
+    scenario: "Stop calling",
+    tryLine: "Please stop calling me.",
   },
   {
     id: "CUST-1010",
@@ -206,7 +218,8 @@ export const CUSTOMERS: CustomerRecord[] = [
     mandate: { method: "UPI Autopay", instrument: "fa•••@paytm", maxAmount: 500 },
     failure: { code: "INSUFFICIENT_FUNDS", failedDaysAgo: 2, debitAttempts: 1 },
     graceDays: 7,
-    demoHint: "Prefers Hindi / Hinglish. Agrees to pay via link.",
+    scenario: "Prefers Hindi",
+    tryLine: "Haan, main abhi pay kar dungi.",
   },
 ];
 

@@ -15,6 +15,8 @@ The demo has a live dashboard with 10 **fictional** customers, browser and real 
 
 > **Live demo:** `https://<your-deployment>.vercel.app` · **Demo video:** `<link>`
 
+![Autopay Recovery Agent dashboard](docs/screenshot.png)
+
 ---
 
 ## How a call works

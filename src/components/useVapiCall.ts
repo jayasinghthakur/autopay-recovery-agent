@@ -27,6 +27,7 @@ export function useVapiCall() {
   const [volume, setVolume] = useState(0);
   const [muted, setMuted] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [startedAt, setStartedAt] = useState<number | null>(null);
 
   useEffect(() => () => void vapiRef.current?.stop(), []);
 
@@ -35,6 +36,7 @@ export function useVapiCall() {
     setError(null);
     setLines([]);
     setMuted(false);
+    setStartedAt(null);
     setCustomerId(cid);
     setPhase("connecting");
 
@@ -51,7 +53,10 @@ export function useVapiCall() {
       const vapi = new VapiClient(data.publicKey);
       vapiRef.current = vapi;
 
-      vapi.on("call-start", () => setPhase("active"));
+      vapi.on("call-start", () => {
+        setPhase("active");
+        setStartedAt(Date.now());
+      });
       vapi.on("call-end", () => {
         setPhase("idle");
         setAssistantSpeaking(false);
@@ -99,7 +104,20 @@ export function useVapiCall() {
     setMuted(v.isMuted());
   }, []);
 
-  return { phase, customerId, lines, assistantSpeaking, volume, muted, error, start, stop, toggleMute, clearError: () => setError(null) };
+  return {
+    phase,
+    customerId,
+    lines,
+    assistantSpeaking,
+    volume,
+    muted,
+    error,
+    startedAt,
+    start,
+    stop,
+    toggleMute,
+    clearError: () => setError(null),
+  };
 }
 
 export type VapiCallControls = ReturnType<typeof useVapiCall>;

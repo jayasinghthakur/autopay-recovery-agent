@@ -5,6 +5,59 @@
   --font-mono: var(--font-geist-mono);
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   font-family: var(--font-geist-sans), system-ui, sans-serif;
+  background-color: #f8fafc;
+  background-image:
+    radial-gradient(1200px 500px at 15% -10%, rgb(59 130 246 / 0.08), transparent 60%),
+    radial-gradient(900px 400px at 100% 0%, rgb(99 102 241 / 0.07), transparent 55%);
+  background-repeat: no-repeat;
+}
+
+/* Thin, quiet scrollbar for the sticky right rail */
+.rail {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(203 213 225) transparent;
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.toast-in {
+  animation: toast-in 0.22s ease-out;
+}
+
+@keyframes drawer-in {
+  from {
+    transform: translateX(24px);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+.drawer-in {
+  animation: drawer-in 0.2s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .toast-in,
+  .drawer-in {
+    animation: none;
+  }
 }

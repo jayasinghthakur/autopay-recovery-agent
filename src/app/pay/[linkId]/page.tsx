@@ -1,4 +1,6 @@
+import { Lock } from "lucide-react";
 import { findCustomer } from "@/data/customers";
+import { LogoMark } from "@/components/Logo";
 import MockPayButton from "@/components/MockPayButton";
 import { formatINR } from "@/lib/format";
 import { getLink } from "@/lib/store";
@@ -12,33 +14,34 @@ export default async function MockCheckout({ params }: PageProps<"/pay/[linkId]"
   const customer = findCustomer(link?.customerId);
 
   return (
-    <main className="min-h-screen bg-slate-100 flex items-center justify-center p-4">
-      <div className="w-full max-w-sm rounded-2xl bg-white shadow-lg ring-1 ring-slate-200 overflow-hidden">
-        <div className="bg-slate-900 px-5 py-4 text-white">
-          <p className="text-xs uppercase tracking-wider text-slate-400">Mock checkout · no real money</p>
-          <p className="mt-1 text-lg font-semibold">{customer?.merchant ?? "Payment link"}</p>
-        </div>
+    <main className="flex min-h-screen items-center justify-center p-4">
+      <div className="w-full max-w-sm overflow-hidden rounded-3xl bg-white shadow-xl ring-1 ring-slate-200">
         {!link || !customer ? (
-          <p className="p-5 text-sm text-slate-600">This payment link doesn&apos;t exist or has expired.</p>
+          <p className="p-6 text-sm text-slate-600">This payment link doesn&apos;t exist or has expired.</p>
         ) : (
-          <div className="p-5 space-y-4">
-            <div>
-              <p className="text-sm text-slate-500">{customer.plan}</p>
-              <p className="text-3xl font-semibold text-slate-900">{formatINR(link.amount)}</p>
-              <p className="mt-1 text-xs text-slate-500">
-                {link.type === "update_mandate" ? "Pay this bill and re-authorise autopay" : "Pay your failed autopay instalment"}
+          <>
+            <div className="bg-gradient-to-br from-blue-600 to-indigo-700 px-6 pb-6 pt-5 text-white">
+              <p className="text-xs font-medium text-blue-100">{customer.merchant}</p>
+              <p className="mt-4 text-4xl font-semibold tabular-nums tracking-tight">{formatINR(link.amount)}</p>
+              <p className="mt-1 text-sm text-blue-100">
+                {link.type === "update_mandate" ? "Pay & re-authorise autopay" : customer.plan}
               </p>
             </div>
-            {link.status === "paid" ? (
-              <p className="rounded-lg bg-emerald-50 px-3 py-2 text-sm font-medium text-emerald-700">Already paid. Thank you!</p>
-            ) : (
-              <MockPayButton linkId={link.id} amount={formatINR(link.amount)} />
-            )}
-            <p className="text-[11px] leading-relaxed text-slate-400">
-              Razorpay test keys aren&apos;t configured on this deployment, so this simulated page stands in for Razorpay Checkout.
-            </p>
-          </div>
+            <div className="space-y-4 p-6">
+              {link.status === "paid" ? (
+                <p className="rounded-xl bg-emerald-50 px-3 py-2.5 text-sm font-medium text-emerald-700">Already paid — thank you!</p>
+              ) : (
+                <MockPayButton linkId={link.id} amount={formatINR(link.amount)} />
+              )}
+              <p className="flex items-center justify-center gap-1.5 text-[11px] text-slate-400">
+                <Lock className="h-3 w-3" /> Simulated checkout · no real money
+              </p>
+            </div>
+          </>
         )}
+        <div className="flex items-center justify-center gap-1.5 border-t border-slate-100 py-3 text-[11px] text-slate-400">
+          <LogoMark size={14} /> Autopay Recovery demo
+        </div>
       </div>
     </main>
   );
